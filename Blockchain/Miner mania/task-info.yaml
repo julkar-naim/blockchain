@@ -252,6 +252,177 @@ files:
         }
     }
   learner_created: false
+- name: src/blockchain/StringUtil.java
+  visible: true
+  text: |
+    package blockchain;
+
+    import java.security.MessageDigest;
+
+    public class StringUtil {
+        /* Applies Sha256 to a string and returns a hash. */
+        public static String applySha256(String input) {
+            try {
+                MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                /* Applies sha256 to our input */
+                byte[] hash = digest.digest(input.getBytes("UTF-8"));
+                StringBuilder hexString = new StringBuilder();
+                for (byte elem : hash) {
+                    String hex = Integer.toHexString(0xff & elem);
+                    if (hex.length() == 1) hexString.append('0');
+                    hexString.append(hex);
+                }
+                return hexString.toString();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+  learner_created: true
+- name: src/blockchain/Blockchain.java
+  visible: true
+  text: |
+    package blockchain;
+
+    import java.time.Duration;
+    import java.time.Instant;
+    import java.util.ArrayList;
+    import java.util.Date;
+    import java.util.List;
+    import java.util.Random;
+    import java.util.stream.Collectors;
+
+    public class Blockchain {
+
+        private List<Block> chain = new ArrayList<>();
+        int prefixLength;
+
+        public Blockchain(int prefixLength) {
+            this.prefixLength = prefixLength;
+        }
+
+        public void createNewBlock() {
+            int id = chain.size() + 1;
+            long timestamp = new Date().getTime();
+            String previousHash = chain.isEmpty() ? "0" :
+                    chain.get(chain.size() - 1).getHash();
+            Block newBlock = createNewBlock(id, timestamp, previousHash);
+            chain.add(newBlock);
+        }
+
+        private Block createNewBlock(int id, long timestamp, String previousHash) {
+            Instant startTime = Instant.now();
+            Random random = new Random();
+            int magicNumber;
+            String hash;
+            do {
+                magicNumber = random.nextInt();
+                hash = generateHash(id, timestamp, previousHash, magicNumber);
+            }while(!isValidHash(hash, prefixLength));
+            Instant endTime = Instant.now();
+            Duration duration = Duration.between(startTime, endTime);
+            long timeTaken = duration.toSeconds();
+            return new Block(id, timestamp, previousHash, magicNumber, hash, timeTaken);
+        }
+
+        public boolean isValid() {
+            if (chain.isEmpty() || chain.size() == 1) return true;
+            boolean ok = true;
+            for (int i = 1; i < chain.size(); i++) {
+                Block previousBlock = chain.get(i - 1);
+                Block currentBlock = chain.get(i);
+                String prevHash = generateHash(
+                        previousBlock.getId(),
+                        previousBlock.getTimestamp(),
+                        previousBlock.getPreviousHash(),
+                        previousBlock.getMagicNumber()
+                );
+                ok &= prevHash.equals(currentBlock.getPreviousHash());
+            }
+            return ok;
+        }
+
+        private boolean isValidHash(String hash, int prefLen) {
+            int countZeroes = 0;
+            for (int i = 0; i < hash.length(); i++) {
+                if (hash.charAt(i) != '0') break;
+                countZeroes++;
+            }
+            return countZeroes == prefLen;
+        }
+
+        private String generateHash(int id, long timestamp, String previousHash, int magicNumber) {
+            String allProps = Integer.toString(id) + Long.toString(timestamp) + previousHash
+                    + Integer.toString(magicNumber);
+            return StringUtil.applySha256(allProps);
+        }
+
+        @Override
+        public String toString() {
+            return chain.stream()
+                    .map(Block::toString)
+                    .collect(Collectors.joining("\n"));
+        }
+    }
+  learner_created: true
+- name: src/blockchain/Block.java
+  visible: true
+  text: |
+    package blockchain;
+
+    public class Block {
+        private final int id;
+        private final long timestamp;
+        private final String previousHash;
+        private final String hash;
+        private final int magicNumber;
+        private final long timeTaken;
+
+        public Block(int id, long timestamp, String previousHash, int magicNumber, String hash, long timeTaken) {
+            this.id = id;
+            this.timestamp = timestamp;
+            this.previousHash = previousHash;
+            this.hash = hash;
+            this.magicNumber = magicNumber;
+            this.timeTaken = timeTaken;
+        }
+
+        @Override
+        public String toString() {
+            return "Block:\n" +
+                    "Id: " + id +
+                    "\nTimestamp: " + timestamp +
+                    "\nMagic number: " + magicNumber +
+                    "\nHash of the previous block:\n" + previousHash +
+                    "\nHash of the block:\n" + hash +
+                    "\nBlock was generating for " + timeTaken + " seconds\n";
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public long getTimestamp() {
+            return timestamp;
+        }
+
+        public String getPreviousHash() {
+            return previousHash;
+        }
+
+        public String getHash() {
+            return hash;
+        }
+
+        public int getMagicNumber() {
+            return magicNumber;
+        }
+
+        public long getTimeTaken() {
+            return timeTaken;
+        }
+    }
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/5415#comment
 status: Unchecked
 record: -1

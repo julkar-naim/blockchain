@@ -20,4 +20,23 @@ public class StringUtil {
             throw new RuntimeException(e);
         }
     }
+
+    public static String blockToHash(Block block) {
+        String props = block.getId().toString() +
+                block.getCreatedBy() +
+                block.getTimestamp().toString() +
+                block.getPreviousHash() +
+                block.getMagicNumber();
+        return applySha256(props);
+    }
+
+    public static boolean isValidN(String hash, int n) {
+        int count = 0;
+        for (int i = 0; i < hash.length(); i++) {
+            if (hash.charAt(i) != '0')
+                break;
+            count++;
+        }
+        return count == n;
+    }
 }

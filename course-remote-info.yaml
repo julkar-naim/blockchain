@@ -3,7 +3,7 @@ hyperskill_project:
   ide_files: https://stepik.org/media/attachments/lesson/209941/additional_files.json
   is_template_based: false
   use_ide: true
-update_date: "Sat, 28 Jan 2023 05:02:07 UTC"
+update_date: "Sat, 11 Feb 2023 14:01:33 UTC"
 stages:
 - id: 271
   step: 5413
@@ -13,7 +13,7 @@ stages:
   is_completed: true
 - id: 273
   step: 5415
-  is_completed: false
+  is_completed: true
 - id: 274
   step: 5416
   is_completed: false
@@ -232,12 +232,12 @@ topics:
     theory_id: 1933
   - title: Stack
     theory_id: 5252
-  - title: Processing strings
-    theory_id: 3551
   - title: Formatted output
     theory_id: 7046
   - title: Writing files
     theory_id: 3652
+  - title: Processing strings
+    theory_id: 3551
   - title: Queue
     theory_id: 20716
   - title: Deque
@@ -301,10 +301,6 @@ topics:
     theory_id: 3620
   - title: Functional interfaces
     theory_id: 11636
-  - title: Command
-    theory_id: 7762
-  - title: Singleton
-    theory_id: 3555
   - title: Threads as objects
     theory_id: 4875
   - title: Custom threads
@@ -321,6 +317,10 @@ topics:
     theory_id: 4895
   - title: ThreadLocal
     theory_id: 23984
+  - title: Command
+    theory_id: 7762
+  - title: Singleton
+    theory_id: 3555
   - title: Anonymous classes
     theory_id: 11896
   - title: Default methods
